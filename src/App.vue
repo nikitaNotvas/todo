@@ -3,6 +3,7 @@ import {ref, watch} from 'vue'
 let todos = ref(JSON.parse(window.localStorage.getItem('todos'))?? [])
 let newTodo = ref([])
 let input = ref('')
+let filter = ref('')
 
 
 function addTodo () {
@@ -16,12 +17,19 @@ todos.value.push({
 function deleted(index) {
   todos.value.splice(index, 1)
 }
+ 
+function activeFilter (todo) {
+  return todo.complete == false
+}
+
 
 function todofilter (todo) {
-  if (filter.value == 'active'){ return todo.complete == false}    
-  else{ 
-    return true
-   } 
+  if (filter.value == 'incompleted')
+  { return todo.complete == false}    
+  else if(filter.value == "completed"){
+    return todo.complete == true 
+  } 
+  else{return true}
   }
 
 
@@ -31,24 +39,36 @@ function todofilter (todo) {
 </script>
 
 <template>
-  <h1>My Todo Application</h1>
+  <img  class="img" src="list.png" alt="Todo List">
 <body>
+
+  <h2> {{ todos.filter(activeFilter).length }} Items left!</h2>
+<input v-model="newTodo" @keydown.enter="addTodo">
+<button @click="addTodo">Add Todo</button><hr>
+
+<p v-if="todos.length >0">  
   <input name="filter" type="radio" value="all" v-model="filter">
 <label>All</label>
-<input name="filter" type="radio" value="active" v-model="filter">
-<label>Active</label><br><hr>
 
-  <li v-for="(todo, index) in todos">
+<input name="filter" type="radio" value="completed" v-model="filter">
+<label>Completed</label>
+
+<input name="filter" type="radio" value="incompleted" v-model="filter">
+<label>Incompleted</label>
+<hr>
+
+</p>
+
+  <li v-for="(todo, index) in todos.filter(todofilter)">
 
     <input type="checkbox" v-model="todo.complete">
 
 {{todo.text}}
 
+
 <button @click="deleted(index)">Delete</button><hr>
-<P v-for="todo in todos" v-if="filter == 'active' && todo.complete == false">{{ todo.text }}</P>
+<P v-for="todo in todos" v-if="filter == 'active' && todo.complete == false" >{{ todo.text }}</P>
   </li>
-  <input v-model="newTodo" @keydown.enter="addTodo">
-  <button @click="addTodo">Add Todo</button>
 
 
 
@@ -63,41 +83,45 @@ body{
 font-style: italic;
 text-align: center;
 background-color: rgb(56, 50, 50);
-color: rgb(44, 138, 0);
+color: rgb(0, 242, 255);
+font-size: medium;
 }
   
 button{ 
 width:100px;
 height: 50px;
-background-color: rgb(115, 0, 153);
-color: rgb(255, 0, 0);
+background-color: rgb(120, 118, 121);
+color: rgb(207, 207, 207);
 font-size: large;}
-
-button:disabled{
-color: rgb(255, 0, 0);
-background-color: rgb(0, 0, 0);
-font-size: large;
-}
 
 button:hover{
 color: rgb(255, 0, 0);
 font-size: large;
-background-color: rgb(7, 108, 2);}
-  
-
-button{color: #000;
+background-color: rgb(29, 226, 229);}
+template{
+  background-color: black;
 }
+
 h1{
 font-size: 45px;    
+text-align: center;
+color: aquamarine;
 }
 
 h2{
 font-size: 40px;
-color: rgb(255, 255, 255);
+color: rgb(0, 221, 255);
 }
 
 p{
-font-size: 30px;
+font-size: 20px;
+}
+.img{
+
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 25%;
 }
 
 </style>
